@@ -1,15 +1,16 @@
 " Vim syntax file
 " Language: dokuwiki
-" Last Change: 2012-01-02
+" Last Change: 2012-03-04
 " Maintainer: Florian Preinstorfer <nblock@archlinux.org>
 " URL: https://github.com/nblock/vim-dokuwiki
 " License: same as vim itself
 " Reference: http://www.dokuwiki.org/syntax
-" Todo: better Tables support (::: missing); Quoting
+" Todo: better Tables support (::: missing)
 " Credits:
 "   Bill Powell <bill@billpowellisalive.com> -- original dokuwiki syntax file
-"   Hou Qingping <dave2008713@gmail.com> -- combinations, fixes
+"   Hou Qingping <dave2008713@gmail.com> -- new features (combinations, footnote, quotes), bug fixes
 "   Sören König <soeren-koenig@freenet.de> -- zim syntax file
+"   Vladimir Zhbanov <vzhbanov@gmail.com> -- various patches
 
 " initial checks. See `:help 44.12`
 if exists("b:current_syntax")
@@ -64,7 +65,7 @@ syn cluster dokuwikiNoneTextItem contains=ALL,@dokuwikiTextItems
 
 " Links: http://github.com/splitbrain/dokuwiki/blob/master/conf/scheme.conf
 syn match dokuwikiLinkCaption "|\zs[^|\]{}]\+" contained
-syn region dokuwikiExternalLink start=+\(http\|https\|telnet\|gopher\|wais\|ftp\|ed2k\|irc\|ldap\):\/\/\|www\.+ end=+ +me=e-1 contains=dokuwikiLinkCaption
+syn region dokuwikiExternalLink start=+\(http\|https\|telnet\|gopher\|wais\|ftp\|ed2k\|irc\|ldap\):\/\/\|www\.+ end=+[ \n]+me=e-1 contains=dokuwikiLinkCaption
 syn region dokuwikiInternalLink start="\[\[" end="\]\]" contains=dokuwikiLinkCaption
 
 " Lists
@@ -79,7 +80,14 @@ syn region dokuwikiControlMacros start="\~\~" end="\~\~" contains=@NoSpell
 "Code Blocks
 syn region dokuwikiCodeBlocks start="<code>" end="</code>"
 syn region dokuwikiCodeBlocks start="<file>" end="</file>"
-syn region dokuwikiCodeBlocks start="^\s\s[^\s\*-]\{3,}" end="$"
+syn region dokuwikiCodeBlocks start="^ \s\+[^*-]" end="$"
+syn region dokuwikiCodeBlocks start="^\t\s*[^*-]" end="$"
+
+"Quotes
+syn match dokuwikiQuotes /^>\+ /
+
+"Footnotes
+syn region dokuwikiFootnotes start=/ ((/ end=/)) / contains=ALLBUT,@dokuwikiNoneTextItem
 
 "Tables
 syn match dokuwikiTable /\(|\)\|\(\^\)/ contains=@dokuwikiTextItems
@@ -94,7 +102,7 @@ syn region dokuwikiComment start="/\*" end="\*/"
 """ Highlighting
 hi link dokuwikiLinebreak Keyword
 
-hi link dokuwikiNowiki Ignore
+hi link dokuwikiNowiki Exception
 
 hi link dokuwikiHeading1 Title
 hi link dokuwikiHeading2 Title
@@ -124,6 +132,10 @@ hi link dokuwikiImageFiles Underlined
 hi link dokuwikiControlMacros Constant
 
 hi link dokuwikiCodeBlocks String
+
+hi link dokuwikiQuotes Visual
+
+hi link dokuwikiFootnotes Comment
 
 hi link dokuwikiTable Label
 
